@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>PerformanceOverlay</AssemblyName>
+    <RootNamespace>PerformanceOverlay</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <!-- WPF reads DPI awareness from app.manifest; suppress the WinForms-only warning. -->
+    <NoWarn>$(NoWarn);WFO0003</NoWarn>
+    <!-- Single-file: extract ALL bundled assemblies to disk so WPF can load Accessibility.dll
+         (needed by tooltip/combobox popups for the MSAA->UIA bridge). Without this the app
+         crashes the first time any popup opens. -->
+    <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="app.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- native injection helpers, embedded so the app is a single standalone exe.
+         Extracted to disk at runtime when injection is used (LoadLibrary needs a file). -->
+    <EmbeddedResource Include="native\PerfOverlayHook.dll" Condition="Exists('native\PerfOverlayHook.dll')">
+      <LogicalName>PerfOverlayHook.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="native\PerfOverlayHook32.dll" Condition="Exists('native\PerfOverlayHook32.dll')">
+      <LogicalName>PerfOverlayHook32.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="native\PerfOverlayInject32.exe" Condition="Exists('native\PerfOverlayInject32.exe')">
+      <LogicalName>PerfOverlayInject32.exe</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.4" />
+    <PackageReference Include="Microsoft.Diagnostics.Tracing.TraceEvent" Version="3.1.16" />
+  </ItemGroup>
+
+</Project>

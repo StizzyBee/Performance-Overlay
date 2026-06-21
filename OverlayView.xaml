@@ -1,0 +1,116 @@
+<UserControl x:Class="PerformanceOverlay.OverlayView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             HorizontalAlignment="Left" VerticalAlignment="Top">
+    <Border x:Name="RootBorder"
+            CornerRadius="8"
+            Padding="10,6"
+            Background="#CC000000">
+      <StackPanel x:Name="Outer" Orientation="Horizontal">
+        <ItemsControl x:Name="ItemsHost">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel x:Name="ItemsPanel" Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <!-- one segment per group of same-labelled metrics -->
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Label}"
+                                   Visibility="{Binding LabelVisibility}"
+                                   Foreground="{Binding LabelBrush}"
+                                   FontFamily="{Binding FontFamily}"
+                                   FontSize="{Binding FontSize}"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,6,0" />
+                        <ItemsControl ItemsSource="{Binding Values}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate><StackPanel Orientation="Horizontal" /></ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <!-- Edit-mode chrome: a thin border + hover ✕; both invisible when EditMode=false -->
+                                    <Border BorderThickness="1" CornerRadius="4" Padding="2,0,2,0" Margin="0,0,6,0"
+                                            BorderBrush="{Binding EditOutlineBrush}"
+                                            Background="{Binding EditBgBrush}"
+                                            Tag="{Binding}"
+                                            MouseEnter="Value_MouseEnter" MouseLeave="Value_MouseLeave"
+                                            PreviewMouseLeftButtonDown="Value_MouseDown"
+                                            PreviewMouseMove="Value_MouseMove"
+                                            Cursor="{Binding EditCursor}">
+                                        <Grid>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding ValueText}"
+                                                           Foreground="{Binding TextBrush}"
+                                                           FontFamily="{Binding FontFamily}"
+                                                           FontSize="{Binding FontSize}"
+                                                           FontWeight="SemiBold"
+                                                           VerticalAlignment="Center" />
+                                                <Polyline Points="{Binding GraphPoints}"
+                                                          Stroke="{Binding AccentBrush}"
+                                                          StrokeThickness="1.4"
+                                                          Width="{Binding GraphWidth}"
+                                                          Height="{Binding GraphHeight}"
+                                                          Margin="5,0,0,0"
+                                                          VerticalAlignment="Center"
+                                                          Visibility="{Binding GraphVisibility}"
+                                                          Stretch="None" />
+                                            </StackPanel>
+                                            <!-- hover-only delete affordance -->
+                                            <Button Content="×" Width="14" Height="14" Padding="0" Margin="0,-10,-10,0"
+                                                    FontSize="12" FontWeight="Bold"
+                                                    HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                    Background="#FFE05656" Foreground="White" BorderThickness="0"
+                                                    Visibility="{Binding HoverVisibility}"
+                                                    Tag="{Binding}" Click="Value_RemoveClick"
+                                                    Cursor="Hand">
+                                                <Button.Resources>
+                                                    <Style TargetType="Border">
+                                                        <Setter Property="CornerRadius" Value="7"/>
+                                                    </Style>
+                                                </Button.Resources>
+                                                <Button.Template>
+                                                    <ControlTemplate TargetType="Button">
+                                                        <Border CornerRadius="7" Background="{TemplateBinding Background}">
+                                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                        </Border>
+                                                    </ControlTemplate>
+                                                </Button.Template>
+                                            </Button>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Text="|"
+                                   Visibility="{Binding SeparatorVisibility}"
+                                   Foreground="{Binding SepBrush}"
+                                   FontFamily="{Binding FontFamily}"
+                                   FontSize="{Binding FontSize}"
+                                   VerticalAlignment="Center"
+                                   Margin="2,0,8,0" />
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- dedicated per-frame frametime graph (collapsed unless enabled) -->
+        <StackPanel x:Name="FtPanel" Orientation="Horizontal" VerticalAlignment="Center"
+                    Visibility="Collapsed">
+            <TextBlock x:Name="FtSep" Text="|" VerticalAlignment="Center" Margin="2,0,8,0"/>
+            <TextBlock x:Name="FtLabel" Text="Frametime" FontWeight="SemiBold"
+                       VerticalAlignment="Center" Margin="0,0,6,0"/>
+            <Border x:Name="FtGraphBox" CornerRadius="3" Padding="0" VerticalAlignment="Center"
+                    Background="#22FFFFFF">
+                <Grid x:Name="FtGrid" ClipToBounds="True">
+                    <Line x:Name="FtRef" Stroke="#55FFFFFF" StrokeThickness="1"
+                          StrokeDashArray="3 3"/>
+                    <Polyline x:Name="FtLine" StrokeThickness="1.2" Stretch="None"/>
+                </Grid>
+            </Border>
+        </StackPanel>
+      </StackPanel>
+    </Border>
+</UserControl>

@@ -1,0 +1,509 @@
+<Window x:Class="PerformanceOverlay.DashboardWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        xmlns:local="clr-namespace:PerformanceOverlay"
+        Title="Performance Overlay"
+        Icon="app.ico"
+        Width="960" Height="680"
+        MinWidth="820" MinHeight="560"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        ResizeMode="CanResize"
+        Background="{StaticResource Bg0Brush}"
+        TextElement.Foreground="{StaticResource TextBrush}"
+        FontFamily="Segoe UI" FontSize="13"
+        UseLayoutRounding="True">
+
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="44" ResizeBorderThickness="6"
+                            CornerRadius="0" GlassFrameThickness="0" UseAeroCaptionButtons="False"/>
+    </shell:WindowChrome.WindowChrome>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="44"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ===== custom title bar ===== -->
+        <Grid Grid.Row="0" Background="{StaticResource Bg1Brush}">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="12,0,0,0">
+                <Border Width="24" Height="24" CornerRadius="6" Background="{StaticResource AccentBrush}" Margin="0,0,9,0">
+                    <TextBlock Text="◉" Foreground="{StaticResource Bg0Brush}" FontSize="14"
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Border>
+                <TextBlock Text="Performance Overlay" FontWeight="SemiBold" FontSize="13"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- centered social links -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                <Button Style="{StaticResource SocialButton}" Click="Social_GitHub"
+                        ToolTip="GitHub — StizzyBee">
+                    <Viewbox Width="17" Height="17">
+                        <Canvas Width="24" Height="24">
+                            <Path Fill="{StaticResource TextBrush}"
+                                  Data="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+                        </Canvas>
+                    </Viewbox>
+                </Button>
+                <Button Style="{StaticResource SocialButton}" Click="Social_CurseForge"
+                        ToolTip="CurseForge — stizzybee">
+                    <Viewbox Width="18" Height="18">
+                        <Canvas Width="24" Height="24">
+                            <Path Fill="#FFF16436"
+                                  Data="M18.326 9.2145S23.2261 8.4418 24 6.1882h-7.5066V4.4H0l2.0318 2.3576V9.173s5.1267-.2665 7.1098 1.2372c2.7146 2.516-3.053 5.917-3.053 5.917L5.0995 19.6c1.5465-1.4726 4.494-3.3775 9.8983-3.2857-2.0565.65-4.1245 1.6651-5.7344 3.2857h10.9248l-1.0288-3.2726s-7.918-4.6688-.8336-7.1127z"/>
+                        </Canvas>
+                    </Viewbox>
+                </Button>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Stretch"
+                        shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                <Button x:Name="MinBtn" Style="{StaticResource CaptionButton}" Content="&#xE921;" Click="Min_Click"/>
+                <Button x:Name="MaxBtn" Style="{StaticResource CaptionButton}" Content="&#xE922;" Click="Max_Click"/>
+                <Button x:Name="CloseBtn" Style="{StaticResource CaptionCloseButton}" Content="&#xE8BB;" Click="CloseBtn_Click"/>
+            </StackPanel>
+        </Grid>
+
+        <DockPanel Grid.Row="1" Margin="18,14,18,18">
+
+        <!-- ===== sub bar ===== -->
+        <Grid DockPanel.Dock="Top" Margin="2,0,2,14">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="StatusText" Style="{StaticResource Hint}" VerticalAlignment="Center" Text="Ready"/>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock x:Name="HotkeyText" Style="{StaticResource Hint}" Margin="0,0,12,0"/>
+                <Button x:Name="ToggleOverlayBtn" Style="{StaticResource AccentButton}"
+                        Content="Show / Hide Overlay" Click="ToggleOverlay_Click"/>
+            </StackPanel>
+        </Grid>
+
+        <TabControl>
+            <!-- ============ SENSORS ============ -->
+            <TabItem Header="Sensors">
+                <Grid Margin="0,14,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="14"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- available -->
+                    <Border Grid.Column="0" Style="{StaticResource Card}">
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Top" Text="AVAILABLE — tick to add" Style="{StaticResource Section}" Margin="0,0,0,8"/>
+                            <TextBox x:Name="SearchBox" DockPanel.Dock="Top" Margin="0,0,0,6"
+                                     TextChanged="SearchBox_TextChanged"/>
+                            <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
+                                <CheckBox x:Name="AdvancedSensorsChk" Content="Show all sensors"
+                                          Click="AdvancedSensors_Toggled"/>
+                                <TextBlock Style="{StaticResource HelpGlyph}"
+                                           ToolTip="Off (default) shows a clean, curated list. On reveals everything LibreHardwareMonitor detects — including every network adapter, VPN/filter driver, and GPU engine sub-load. Most of that isn't useful in a game overlay."/>
+                            </StackPanel>
+                            <ListBox x:Name="SensorList">
+                                <ListBox.GroupStyle>
+                                    <GroupStyle>
+                                        <GroupStyle.ContainerStyle>
+                                            <Style TargetType="{x:Type GroupItem}">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="{x:Type GroupItem}">
+                                                            <Expander Style="{StaticResource CategoryExpander}"
+                                                                      IsExpanded="False">
+                                                                <Expander.Header>
+                                                                    <StackPanel Orientation="Horizontal">
+                                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold"
+                                                                                   Foreground="{StaticResource TextBrush}"/>
+                                                                        <TextBlock Text="{Binding ItemCount, StringFormat=' ({0})'}"
+                                                                                   Foreground="{StaticResource TextDimBrush}"/>
+                                                                    </StackPanel>
+                                                                </Expander.Header>
+                                                                <ItemsPresenter Margin="6,2,0,6"/>
+                                                            </Expander>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </GroupStyle.ContainerStyle>
+                                    </GroupStyle>
+                                </ListBox.GroupStyle>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="6,3">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                      Checked="Sensor_Toggled" Unchecked="Sensor_Toggled"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="4,0"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding LiveValue}"
+                                                       Foreground="{StaticResource AccentBrush}" FontFamily="Consolas"
+                                                       MinWidth="64" TextAlignment="Right"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </DockPanel>
+                    </Border>
+
+                    <!-- shown / ordered: THE ACTUAL overlay is the reorder UI -->
+                    <Border Grid.Column="2" Style="{StaticResource Card}">
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Top" Text="YOUR OVERLAY — drag to reorder, hover a value for ✕"
+                                       Style="{StaticResource Section}" Margin="0,0,0,8"/>
+
+                            <!-- live, draggable overlay sample -->
+                            <Border DockPanel.Dock="Top" CornerRadius="10" Padding="14" MinHeight="80">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Color="#FF202225" Offset="0"/>
+                                        <GradientStop Color="#FF0E0F11" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <local:OverlayView x:Name="ShownOverlay" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            </Border>
+
+                            <!-- selected-item editor -->
+                            <Border DockPanel.Dock="Top" Background="{StaticResource Bg2Brush}" CornerRadius="8"
+                                    Padding="10" Margin="0,10,0,0">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock x:Name="SelLabel" Text="Click a value above to edit it"
+                                               Style="{StaticResource Hint}" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                    <TextBox x:Name="SelLabelBox" Grid.Column="1" Padding="6,4"
+                                             TextChanged="SelLabel_Changed" IsEnabled="False"/>
+                                    <CheckBox x:Name="SelGraphChk" Grid.Column="2" Content="graph"
+                                              Margin="10,0,6,0" Click="SelGraph_Toggled" IsEnabled="False"/>
+                                    <Button x:Name="SelRemoveBtn" Grid.Column="3" Content="Remove"
+                                            Click="SelRemove_Click" IsEnabled="False"/>
+                                </Grid>
+                            </Border>
+
+                            <!-- compact list of what's active, in overlay order -->
+                            <TextBlock DockPanel.Dock="Top" Text="ACTIVE SENSORS" Style="{StaticResource Section}"
+                                       Margin="0,14,0,6"/>
+                            <TextBlock DockPanel.Dock="Bottom" Style="{StaticResource Hint}" Margin="2,8,0,0"
+                                       Text="Tip: drag a value above to reorder. Values with the same label group together."/>
+                            <ListBox x:Name="ActiveList" Background="Transparent" BorderThickness="0">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,2,0,2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Grid.Column="0" Background="{StaticResource Bg3Brush}" CornerRadius="4"
+                                                    Padding="6,1" Margin="0,0,8,0" VerticalAlignment="Center" MinWidth="44">
+                                                <TextBlock Text="{Binding Category}" FontSize="10" FontWeight="Bold"
+                                                           Foreground="{StaticResource TextDimBrush}" TextAlignment="Center"/>
+                                            </Border>
+                                            <TextBlock Grid.Column="1" Text="{Binding DisplayName}"
+                                                       TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding LiveValue}"
+                                                       Foreground="{StaticResource AccentBrush}"
+                                                       FontFamily="Consolas" MinWidth="64" TextAlignment="Right"
+                                                       VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </DockPanel>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <!-- ============ FPS ============ -->
+            <TabItem Header="FPS">
+                <ScrollViewer Margin="0,14,0,0" VerticalScrollBarVisibility="Auto">
+                    <StackPanel MaxWidth="640" HorizontalAlignment="Left">
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox x:Name="EnableFpsChk" Content="Enable FPS monitoring"
+                                              Click="AnyChanged" FontWeight="SemiBold"/>
+                                    <TextBlock Style="{StaticResource HelpGlyph}"
+                                               ToolTip="Counts frames presented by the game using Windows ETW (no injection, anti-cheat safe). Covers DirectX 9–12 games. Vulkan/OpenGL games need the optional Injection mode below."/>
+                                </StackPanel>
+                                <TextBlock x:Name="FpsStatusText" Style="{StaticResource Hint}" Margin="27,2,0,0"/>
+
+                                <Grid Margin="0,14,0,0" Width="360" HorizontalAlignment="Left">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Content="Stats window"/>
+                                    <TextBlock Grid.Column="1" Style="{StaticResource HelpGlyph}" Margin="0,0,8,0"
+                                               ToolTip="How many recent seconds of frames are used to compute Average, Lowest, Highest, 1% Low and 0.1% Low. Bigger window = smoother numbers but slower to react."/>
+                                    <Slider x:Name="FpsWindowSlider" Grid.Column="2" Minimum="5" Maximum="120"
+                                            ValueChanged="AnyChanged" VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="FpsWindowText" Grid.Column="3" MinWidth="44" TextAlignment="Right"/>
+                                </Grid>
+
+                                <Grid Margin="0,10,0,0" Width="360" HorizontalAlignment="Left">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Content="FPS calibration"/>
+                                    <TextBlock Grid.Column="1" Style="{StaticResource HelpGlyph}" Margin="0,0,8,0"
+                                               ToolTip="Adjusts the displayed FPS by a fixed amount. Windows ETW counts frames the game presented — with vsync or a frame cap, that can read a bit above the actual on-screen FPS. If your in-game counter shows 60 but this shows 70, set this to -10. Disabled while DLL injection is on (injection is exact, no calibration needed). Your value is remembered for when injection is turned back off."/>
+                                    <Slider x:Name="FpsOffsetSlider" Grid.Column="2" Minimum="-30" Maximum="30"
+                                            ValueChanged="AnyChanged" VerticalAlignment="Center"
+                                            IsSnapToTickEnabled="True" TickFrequency="1"/>
+                                    <TextBlock x:Name="FpsOffsetText" Grid.Column="3" MinWidth="44" TextAlignment="Right"/>
+                                </Grid>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                    <CheckBox x:Name="FrametimeGraphChk" Content="Show frametime graph"
+                                              Click="AnyChanged"/>
+                                    <TextBlock Style="{StaticResource HelpGlyph}"
+                                               ToolTip="Adds a live frame-pacing graph to the overlay, plotting every frame's render time (ms). A flat low line = smooth; tall spikes = stutters. Scale is 0–50 ms with a dashed line marking 60 FPS (16.7 ms)."/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="INJECTION (ADVANCED)" Style="{StaticResource Section}"/>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox x:Name="InjectionChk" FontWeight="SemiBold" Click="Injection_Toggled"
+                                              Content="Inject DLL for accurate FPS (data only — nothing is drawn in-game)"/>
+                                    <TextBlock Style="{StaticResource HelpGlyph}"
+                                               ToolTip="Loads a small DLL into the game so the overlay can read its exact present timings. Required for Vulkan/OpenGL FPS. ⚠ Use ONLY for games without anti-cheat — injection can trigger bans. Automatically turns itself off when the game closes."/>
+                                </StackPanel>
+                                <TextBlock x:Name="InjectionStatusText" Style="{StaticResource Hint}" Margin="27,2,0,0"/>
+                                <Border Background="#22E05656" BorderBrush="{StaticResource DangerBrush}" BorderThickness="1"
+                                        CornerRadius="8" Padding="10" Margin="0,10,0,0">
+                                    <TextBlock Style="{StaticResource Hint}" Foreground="{StaticResource TextBrush}"
+                                               Text="⚠ Only enable this for games WITHOUT anti-cheat. Injecting into an anti-cheat protected game can get you banned and may crash the game. Works with 32-bit and 64-bit games. Adds Vulkan/OpenGL support and more precise frametimes; falls back to normal monitoring if a game isn't captured. For safety this turns itself OFF automatically once the injected game closes."/>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="FPS LIMIT" Style="{StaticResource Section}"/>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox x:Name="FpsCapChk" Content="Cap the game's FPS" Click="FpsCap_Toggled"/>
+                                    <TextBlock Style="{StaticResource HelpGlyph}"
+                                               ToolTip="Limits the game to the chosen frame rate by pacing its present calls from inside the hook. Requires DLL injection to be ON (no-anti-cheat games only). Great for reducing heat/coil whine on menus, or matching a monitor's refresh."/>
+                                </StackPanel>
+                                <Grid Margin="0,12,0,0" Width="380" HorizontalAlignment="Left">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Content="Limit"/>
+                                    <Slider x:Name="FpsCapSlider" Grid.Column="1" Minimum="20" Maximum="360"
+                                            IsSnapToTickEnabled="True" TickFrequency="1"
+                                            VerticalAlignment="Center" ValueChanged="FpsCapSlider_Changed"/>
+                                    <TextBox x:Name="FpsCapBox" Grid.Column="2" Width="56" Margin="10,0,0,0"
+                                             Padding="6,4" TextAlignment="Center" LostFocus="FpsCapBox_Changed"
+                                             KeyDown="FpsCapBox_KeyDown"/>
+                                </Grid>
+                                <TextBlock x:Name="FpsCapNote" Style="{StaticResource Hint}" Margin="0,6,0,0"
+                                           Text="Requires DLL injection (above) to be enabled."/>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="ADD FPS METRICS" Style="{StaticResource Section}"/>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel x:Name="FpsMetricsPanel"/>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+                            <StackPanel>
+                                <TextBlock Text="Good to know" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                                <TextBlock Style="{StaticResource Hint}"
+                                           Text="• FPS is read from frame-present events, the same source PresentMon uses — safe for online games.&#x0a;• Covers DirectX 9/10/11/12 games. Pure Vulkan/OpenGL titles aren't captured in this version.&#x0a;• With DLSS / FSR Frame Generation on, the FPS shown includes the generated frames (the 'DLSS FPS').&#x0a;• Stats apply to whichever game window is in the foreground."/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ STYLE ============ -->
+            <TabItem Header="Style">
+                <ScrollViewer Margin="0,14,0,0" VerticalScrollBarVisibility="Auto">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="14"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- left: appearance -->
+                        <Border Grid.Column="0" Style="{StaticResource Card}" VerticalAlignment="Top">
+                            <StackPanel>
+                                <TextBlock Text="APPEARANCE" Style="{StaticResource Section}" Margin="0,0,0,8"/>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <Label Grid.Row="0" Content="Font" Margin="0,0,0,8"/>
+                                    <ComboBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" x:Name="FontBox"
+                                              Margin="0,0,0,8" SelectionChanged="AnyChanged"/>
+
+                                    <Label Grid.Row="1" Content="Size" Margin="0,0,0,8"/>
+                                    <Slider Grid.Row="1" Grid.Column="1" x:Name="FontSizeSlider" Minimum="9" Maximum="48"
+                                            Margin="0,0,0,8" VerticalAlignment="Center" ValueChanged="AnyChanged"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="2" x:Name="FontSizeText" MinWidth="28"
+                                               TextAlignment="Right" Margin="0,0,0,8"/>
+
+                                    <Label Grid.Row="2" Content="Text" Margin="0,0,0,8"/>
+                                    <TextBox Grid.Row="2" Grid.Column="1" x:Name="TextColorBox" Margin="0,0,0,8" LostFocus="AnyChanged"/>
+                                    <Button Grid.Row="2" Grid.Column="2" x:Name="TextColorSwatch" Width="30" Height="30"
+                                            Margin="8,0,0,8" Click="PickColor_Click" Tag="text"/>
+
+                                    <Label Grid.Row="3" Content="Back" Margin="0,0,0,8"/>
+                                    <TextBox Grid.Row="3" Grid.Column="1" x:Name="BackColorBox" Margin="0,0,0,8" LostFocus="AnyChanged"/>
+                                    <Button Grid.Row="3" Grid.Column="2" x:Name="BackColorSwatch" Width="30" Height="30"
+                                            Margin="8,0,0,8" Click="PickColor_Click" Tag="back"/>
+
+                                    <Label Grid.Row="4" Content="Opacity"/>
+                                    <Slider Grid.Row="4" Grid.Column="1" x:Name="OpacitySlider" Minimum="0" Maximum="100"
+                                            VerticalAlignment="Center" ValueChanged="AnyChanged"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="2" x:Name="OpacityText" MinWidth="28" TextAlignment="Right"/>
+                                </Grid>
+                                <TextBlock Style="{StaticResource Hint}" Margin="0,10,0,0"
+                                           Text="Click a swatch to pick a color, or type #AARRGGBB hex."/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- right: layout + preview -->
+                        <StackPanel Grid.Column="2">
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="LAYOUT" Style="{StaticResource Section}" Margin="0,0,0,8"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Content="Orientation"/>
+                                        <ComboBox Grid.Column="1" x:Name="OrientationBox" SelectionChanged="AnyChanged">
+                                            <ComboBoxItem Content="Horizontal"/>
+                                            <ComboBoxItem Content="Vertical"/>
+                                        </ComboBox>
+                                    </Grid>
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox x:Name="ShowLabelsChk" Content="Show labels (GPU, CPU, RAM…)" Click="AnyChanged"/>
+                                        <TextBlock Style="{StaticResource HelpGlyph}"
+                                                   ToolTip="When off, only numbers appear in the overlay (e.g. '37% 58°' instead of 'GPU 37% 58°'). Saves space."/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox x:Name="ShowGraphsChk" Content="Show mini graphs" Click="AnyChanged"/>
+                                        <TextBlock Style="{StaticResource HelpGlyph}"
+                                                   ToolTip="Tiny line graph next to each value, plotting the last ~60 seconds of history."/>
+                                    </StackPanel>
+                                    <CheckBox x:Name="FahrenheitChk" Content="Use Fahrenheit (°F)" Click="AnyChanged"/>
+                                </StackPanel>
+                            </Border>
+
+                            <TextBlock Text="PREVIEW — exactly what the overlay shows" Style="{StaticResource Section}"/>
+                            <Border CornerRadius="10" Padding="18" MinHeight="80">
+                                <Border.Background>
+                                    <!-- subtle checker-ish backdrop so overlay transparency reads -->
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Color="#FF202225" Offset="0"/>
+                                        <GradientStop Color="#FF0E0F11" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <local:OverlayView x:Name="PreviewView" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ============ GENERAL ============ -->
+            <TabItem Header="General">
+                <ScrollViewer Margin="0,14,0,0" VerticalScrollBarVisibility="Auto">
+                    <StackPanel MaxWidth="640" HorizontalAlignment="Left">
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="BEHAVIOR" Style="{StaticResource Section}" Margin="0,0,0,8"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox x:Name="LockChk" Content="Lock position (uncheck to drag the overlay)" Click="AnyChanged"/>
+                                    <TextBlock Style="{StaticResource HelpGlyph}"
+                                               ToolTip="Locked = the overlay can't be moved by clicking it. Unlock to drag it to a new spot, then lock again so the game doesn't bump it."/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox x:Name="ClickThroughChk" Content="Click-through when locked (mouse passes to the game)" Click="AnyChanged"/>
+                                    <TextBlock Style="{StaticResource HelpGlyph}"
+                                               ToolTip="When ON, clicking where the overlay is sends the click to the game underneath. Only takes effect while the overlay is locked."/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="OVERLAY POSITION" Style="{StaticResource Section}" Margin="0,0,0,8"/>
+                                    <TextBlock Style="{StaticResource HelpGlyph}" Margin="6,0,0,8"
+                                               ToolTip="Snap the overlay to a screen corner. Handy if you dragged it off-screen and can't find it, or just want it placed precisely."/>
+                                </StackPanel>
+                                <WrapPanel>
+                                    <Button Content="↖ Top-Left" Click="SnapTL_Click" Margin="0,0,8,8"/>
+                                    <Button Content="↗ Top-Right" Click="SnapTR_Click" Margin="0,0,8,8"/>
+                                    <Button Content="↙ Bottom-Left" Click="SnapBL_Click" Margin="0,0,8,8"/>
+                                    <Button Content="↘ Bottom-Right" Click="SnapBR_Click" Margin="0,0,8,8"/>
+                                </WrapPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+                            <StackPanel>
+                                <TextBlock Text="CONFIG LOCATION" Style="{StaticResource Section}" Margin="0,0,0,8"/>
+                                <TextBlock x:Name="ConfigPathText" Style="{StaticResource Hint}" TextTrimming="CharacterEllipsis"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                    <Button Content="Change folder…" Click="ChangeConfig_Click" Margin="0,0,8,0"/>
+                                    <Button Content="Use app folder (portable)" Click="PortableConfig_Click"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource Card}" Margin="0,12,0,0">
+                            <StackPanel>
+                                <TextBlock Text="ABOUT" Style="{StaticResource Section}" Margin="0,0,0,8"/>
+                                <TextBlock x:Name="HotkeyText2" Style="{StaticResource Hint}"/>
+                                <Button Content="Reset all settings to defaults" Margin="0,12,0,0"
+                                        HorizontalAlignment="Left" Click="Reset_Click"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+        </DockPanel>
+    </Grid>
+</Window>

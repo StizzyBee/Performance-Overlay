@@ -1,0 +1,67 @@
+{
+  "Sensors": [
+    {
+      "Id": "fps:current",
+      "CustomLabel": "",
+      "ShowGraph": false
+    },
+    {
+      "Id": "/gpu-nvidia/0/load/0",
+      "CustomLabel": "",
+      "ShowGraph": false
+    },
+    {
+      "Id": "/gpu-nvidia/0/temperature/0",
+      "CustomLabel": "",
+      "ShowGraph": false
+    },
+    {
+      "Id": "/intelcpu/0/load/0",
+      "CustomLabel": "",
+      "ShowGraph": false
+    },
+    {
+      "Id": "/intelcpu/0/temperature/12",
+      "CustomLabel": "",
+      "ShowGraph": false
+    },
+    {
+      "Id": "/ram/load/0",
+      "CustomLabel": "",
+      "ShowGraph": false
+    },
+    {
+      "Id": "gpu:vram-used",
+      "CustomLabel": "",
+      "ShowGraph": false
+    }
+  ],
+  "UpdateIntervalMs": 1000,
+  "UseFahrenheit": false,
+  "EnableFpsMonitor": true,
+  "FpsWindowSeconds": 30,
+  "UseInjection": false,
+  "FpsOffset": -10,
+  "ShowFrametimeGraph": false,
+  "ShowAdvancedSensors": false,
+  "FpsCapEnabled": true,
+  "FpsCap": 60,
+  "Orientation": "Horizontal",
+  "ShowLabels": true,
+  "ShowUnits": true,
+  "ShowGraphs": true,
+  "GraphSeconds": 60,
+  "FontSize": 16,
+  "TextColor": "#FFFFFFFF",
+  "AccentColor": "#FFFFFFFF",
+  "BackgroundColor": "#CC000000",
+  "BackgroundOpacity": 0.8,
+  "FontFamily": "Segoe UI",
+  "PositionX": 1,
+  "PositionY": 5,
+  "LockPosition": true,
+  "ClickThrough": true,
+  "OverlayVisible": true,
+  "HotkeyModifiers": "Control,Shift",
+  "HotkeyKey": "O"
+}
