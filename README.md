@@ -60,7 +60,7 @@ in a read-only location). Rebuild it any time with `publish.bat`.
 ## Build & Run
 
 ```powershell
-dotnet build PerformanceOverlay.csproj -c Release
+dotnet publish -c Release -r win-x64 --self-contained true
 ```
 
 Run it from the **Start Menu** ("Performance Overlay"), double-click
